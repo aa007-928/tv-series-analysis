@@ -1,7 +1,9 @@
-transformers==4.44.0
-huggingface_hub==0.24.5
-nltk==3.8.1
-gradio==4.36.1
+transformers
+huggingface_hub
+nltk
+gradio
 torch
 pandas
 seaborn
+spacy
+pyvis
