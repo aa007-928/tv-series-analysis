@@ -1,7 +1,10 @@
 import gradio as gr
 from theme_classifier import themeClassifier
 from character_network import named_entity_recog,characterNetwork
+from text_classification import jutsuClassifier
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 def get_themes(theme_list,subtitles_path,save_path):
     theme_list = theme_list.split(',')
@@ -28,6 +31,10 @@ def get_char_network(subtitles_path,NER_save_path):
 
     return html_embed
 
+def classify_text(textClassification_model,textClassification_dataset_path,text_example):
+    jutsu_classifier = jutsuClassifier(model_path=textClassification_model, dataset_path=textClassification_dataset_path, Huggingface_token=os.getenv('Huggingface_token'))
+    op = jutsu_classifier.classification_inference(text_example)
+    return op[0]
 
 def main():
     with gr.Blocks() as iface:
@@ -53,6 +60,18 @@ def main():
                 NER_save_path = gr.Textbox(label='Network Save Path')
                 NER_submit_button = gr.Button("Generate Network")
                 NER_submit_button.click(get_char_network,inputs=[subtitles_path,NER_save_path],outputs=[character_graph])
+
+        #text classification
+        gr.HTML("<h1>Text Classification with LLM</h1>")
+        with gr.Row():
+            with gr.Column():
+                textClassify_op = gr.Textbox(label='Output of Text Classification')
+            with gr.Column():
+                textClassification_model = gr.Textbox(label='Model Path')
+                textClassification_dataset_path = gr.Textbox(label='Dataset Path')
+                text_example = gr.Textbox(label='Text I/P')
+                textClassify_submit_button = gr.Button("Classify Text - Jutsu")
+                textClassify_submit_button.click(classify_text,inputs=[textClassification_model,textClassification_dataset_path,text_example],outputs=[textClassify_op])
 
                 
     iface.launch(share=True)

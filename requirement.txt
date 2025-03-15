@@ -1,4 +1,5 @@
 transformers
+datasets
 huggingface_hub
 nltk
 gradio
@@ -7,3 +8,6 @@ pandas
 seaborn
 spacy
 pyvis
+scikit-learn
+evaluate
+python-dotenv
