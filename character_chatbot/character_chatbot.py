@@ -98,7 +98,7 @@ class CharacterChatbot():
             args=training_args,
             peft_config=peft_config,
             dataset_text_field = 'prompt',
-            max_seq_len = 512  
+            max_seq_length = 512  
         )
 
         trainer.train()
@@ -134,7 +134,7 @@ class CharacterChatbot():
     def model_chat(self,message,history):
         messages = []
         #system prompt
-        messages.append(""" You are Naruto Uzumaki from anime "Naruto". Your response should reflect his personality and speech patterns \n """)
+        messages.append({'role':'system','content':""" You are Naruto Uzumaki from anime "Naruto". Your response should reflect his personality and speech patterns \n """})
 
         for msg_n_resp in history:  #history is a list of list(w 2 strings)
             messages.append({'role':'user', 'content':msg_n_resp[0]})

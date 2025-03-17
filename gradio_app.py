@@ -38,7 +38,7 @@ def classify_text(textClassification_model,textClassification_dataset_path,text_
     return op[0]
 
 def character_chat(message,history):    #gradio provides message and history(keeps in memory)
-    chatbot = CharacterChatbot('Aayush/Naruto-Llama-3-8B',Huggingface_token=os.getenv('Huggingface_token'))
+    chatbot = CharacterChatbot('aayush007/Naruto-Llama-3-8B',Huggingface_token=os.getenv('Huggingface_token'))
     output_msg = chatbot.model_chat(message,history)
     output_msg = output_msg['content'].strip()
     return output_msg
