@@ -11,3 +11,6 @@ pyvis
 scikit-learn
 evaluate
 python-dotenv
+bitsandbytes
+peft
+trl

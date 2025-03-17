@@ -2,6 +2,7 @@ import gradio as gr
 from theme_classifier import themeClassifier
 from character_network import named_entity_recog,characterNetwork
 from text_classification import jutsuClassifier
+from character_chatbot import CharacterChatbot
 import os
 from dotenv import load_dotenv
 load_dotenv()
@@ -35,6 +36,13 @@ def classify_text(textClassification_model,textClassification_dataset_path,text_
     jutsu_classifier = jutsuClassifier(model_path=textClassification_model, dataset_path=textClassification_dataset_path, Huggingface_token=os.getenv('Huggingface_token'))
     op = jutsu_classifier.classification_inference(text_example)
     return op[0]
+
+def character_chat(message,history):    #gradio provides message and history(keeps in memory)
+    chatbot = CharacterChatbot('Aayush/Naruto-Llama-3-8B',Huggingface_token=os.getenv('Huggingface_token'))
+    output_msg = chatbot.model_chat(message,history)
+    output_msg = output_msg['content'].strip()
+    return output_msg
+
 
 def main():
     with gr.Blocks() as iface:
@@ -73,7 +81,13 @@ def main():
                 textClassify_submit_button = gr.Button("Classify Text - Jutsu")
                 textClassify_submit_button.click(classify_text,inputs=[textClassification_model,textClassification_dataset_path,text_example],outputs=[textClassify_op])
 
-                
+        #character chatbot
+        gr.HTML("<h1>Character(Naruto) Chatbot</h1>")
+        with gr.Row():
+            with gr.Column():
+                gr.ChatInterface(character_chat)
+
+
     iface.launch(share=True)
 
 if __name__ == '__main__':

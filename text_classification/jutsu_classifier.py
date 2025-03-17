@@ -62,7 +62,7 @@ class jutsuClassifier:
     def preProcessing(self,tokenizer,exmaples):
         return tokenizer(exmaples['text'],truncation=True)
     
-    def laodDataset(self,dataset_path):
+    def loadDataset(self,dataset_path):
         df = pd.read_json(dataset_path,lines=True)  #read from jsonl
         df['single_jutsu_type'] = df['jutsu_type'].apply(self.get_single_jutsu)
         df['text'] = df['jutsu_name'] + '. ' + df['jutsu_descp']
