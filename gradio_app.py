@@ -33,12 +33,12 @@ def get_char_network(subtitles_path,NER_save_path):
     return html_embed
 
 def classify_text(textClassification_model,textClassification_dataset_path,text_example):
-    jutsu_classifier = jutsuClassifier(model_path=textClassification_model, dataset_path=textClassification_dataset_path, Huggingface_token=os.getenv('Huggingface_token'))
+    jutsu_classifier = jutsuClassifier(saved_model_path=textClassification_model, dataset_path=textClassification_dataset_path, Huggingface_token=os.getenv('Huggingface_token'))
     op = jutsu_classifier.classification_inference(text_example)
     return op[0]
 
 def character_chat(message,history):    #gradio provides message and history(keeps in memory)
-    chatbot = CharacterChatbot('aayush007/Naruto-Llama-3-8B',Huggingface_token=os.getenv('Huggingface_token'))
+    chatbot = CharacterChatbot('aayush007/Naruto-Llama-3.1-8B-Instruct',Huggingface_token=os.getenv('Huggingface_token'))
     output_msg = chatbot.model_chat(message,history)
     output_msg = output_msg['content'].strip()
     return output_msg

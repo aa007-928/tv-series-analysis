@@ -14,7 +14,7 @@ class CharacterChatbot():
         self.model_path = model_path
         self.dataset_path = dataset_path
         self.Huggingface_token = Huggingface_token
-        self.base_model = 'meta-llama/Meta-Llama-3-8B-Instruct'
+        self.base_model = 'meta-llama/Llama-3.1-8B-Instruct'
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
         if Huggingface_token:
@@ -23,14 +23,14 @@ class CharacterChatbot():
                 self.model = self.loadModel(self.model_path)
             else:
                 print('model not found in hub. Proceeding with training ...')
-                data = self.loadDataset(dataset_path)
+                data = self.loadDataset()
 
                 self.trainModel(self.base_model,data)
 
                 self.model = self.loadModel(self.model_path)
 
 
-    def filter_transcript(text):
+    def filter_transcript(self,text):
         result = re.sub(r'\(.*?\)','',text) #replacing anything inside bracket in text string
         return result
 
@@ -72,7 +72,7 @@ class CharacterChatbot():
         tokenizer.pad_token = tokenizer.eos_token
 
         #LoRA config
-        peft_config = LoraConfig(lora_alpha = 16, lora_dropout = 0.1, r = 64, bias="none", task_type="CASUAL_LM")
+        peft_config = LoraConfig(lora_alpha = 16, lora_dropout = 0.1, r = 64, bias="none", task_type="CAUSAL_LM")
 
         training_args = SFTConfig(
             output_dir=op_dir,
@@ -88,17 +88,19 @@ class CharacterChatbot():
             warmup_ratio=0.3,
             group_by_length=True,   #to make training more optimized -> as similar length closer to each other
             lr_scheduler_type='constant',
-            report_to="none"    #can report to W&B
+            report_to="none",    #can report to W&B
+            dataset_text_field = 'prompt',
+            max_seq_length = 512 
         )
 
         trainer = SFTTrainer(
             model=model,
-            tokenizer=tokenizer,
+            processing_class=tokenizer,
             train_dataset=data,
             args=training_args,
             peft_config=peft_config,
-            dataset_text_field = 'prompt',
-            max_seq_length = 512  
+            # dataset_text_field = 'prompt',
+            # max_seq_length = 512  
         )
 
         trainer.train()
@@ -143,7 +145,7 @@ class CharacterChatbot():
         messages.append({'role':'user','content':message})
 
         terminator = [self.model.tokenizer.eos_token_id,
-                      self.model.tokenizer.eos_tokens_to_ids("<|eot_id|>")]
+                      self.model.tokenizer.convert_tokens_to_ids("<|eot_id|>")]
         
         output = self.model(messages,max_length=256,eos_token_id=terminator,do_sample=True,temperature=0.6,top_p=0.9)
 

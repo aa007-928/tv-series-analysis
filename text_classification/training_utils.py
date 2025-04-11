@@ -10,5 +10,5 @@ def compute_metrics(p):
 
 
 def getClassWts(df):
-    return compute_class_weight("balanced", classes=sorted(df['label'].unique().tolist(), y=df['label'].tolist()))
+    return compute_class_weight("balanced", classes=sorted(df['label'].unique().tolist()), y=df['label'].tolist())
                          

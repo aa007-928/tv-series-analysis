@@ -14,7 +14,7 @@ from .custom_trainer import customTrainer
 from .training_utils import getClassWts,compute_metrics
 
 class jutsuClassifier:
-    def __intit__(self,saved_model_path,dataset_path=None,model_name="distilbert/distilbert-base-uncased",text_col='text',label_col='jutsu',test_size=0.2,num_labels=3,Huggingface_token=None):
+    def __init__(self,saved_model_path,dataset_path=None,model_name="distilbert/distilbert-base-uncased",text_col='text',label_col='jutsu',test_size=0.2,num_labels=3,Huggingface_token=None):
         self.model_name = model_name
         self.saved_model_path = saved_model_path
         self.dataset_path = dataset_path
@@ -31,7 +31,7 @@ class jutsuClassifier:
         self.tokenizer = self.loadTokenizer()
 
         if not huggingface_hub.repo_exists(self.saved_model_path):
-            if not self.model:
+            if not self.dataset_path:
                 raise ValueError('model/saved_model path is required')
             
             data_train_tokenized, data_test_tokenized = self.loadDataset(self.dataset_path) #return tokenized 
@@ -48,7 +48,7 @@ class jutsuClassifier:
 
     
     def loadTokenizer(self):
-        model_in_use = self.saved_model_path if huggingface_hub.repo_exists(self.saved_model_path) else self.model
+        model_in_use = self.saved_model_path if huggingface_hub.repo_exists(self.saved_model_path) else self.model_name
         return AutoTokenizer.from_pretrained(model_in_use)
     
     def get_single_jutsu(self,jutsu):
@@ -68,7 +68,7 @@ class jutsuClassifier:
         df['text'] = df['jutsu_name'] + '. ' + df['jutsu_descp']
         df[self.label_col] = df['single_jutsu_type']
         df = df[['text',self.label_col]]
-        df.dropna()
+        df = df.dropna()
 
         #clean text
         cleaner = Cleaner()
@@ -102,7 +102,7 @@ class jutsuClassifier:
             learning_rate=2e-4,
             per_device_train_batch_size=8,
             per_device_eval_batch_size=8,
-            num_training_epochs = 5,
+            num_train_epochs = 5,
             weight_decay=0.01,
             evaluation_strategy='epoch',
             logging_strategy='epoch',
@@ -124,7 +124,7 @@ class jutsuClassifier:
             torch.cuda.empty_cache()
 
     def loadModel(self,model_path):
-        model = pipeline('text_classification',model=model_path,return_all_score=True)
+        model = pipeline('text-classification',model=model_path,return_all_scores=True)
         return model
     
     def postProcessing(self,model_op):

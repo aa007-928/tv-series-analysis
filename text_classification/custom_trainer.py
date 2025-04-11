@@ -3,14 +3,14 @@ from torch import nn
 from transformers import Trainer
 
 class customTrainer(Trainer):
-    def compute_loss(self,model,inputs,return_outputs=False):
+    def compute_loss(self,model,inputs,return_outputs=False,num_items_in_batch = None):
         labels = inputs.get('labels')
 
         outputs = model(**inputs)
         logits = outputs.get('logits')
         logits = logits.float()
 
-        loss_func = nn.CrossEntropyLoss(weight=torch.tensor(self.class_weights).to(device=self.device))
+        loss_func = nn.CrossEntropyLoss(weight=torch.tensor(self.class_weights,dtype=torch.float).to(device=self.device))
         loss = loss_func(logits.view(-1,self.model.config.num_labels),labels.view(-1))
         return (loss,outputs) if return_outputs else loss
     

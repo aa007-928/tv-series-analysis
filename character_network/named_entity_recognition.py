@@ -28,7 +28,7 @@ class named_entity_recog:
     def get_ners(self,dataset_path,save_path=None):
         if save_path and os.path.exists(save_path):
             df = pd.read_csv(save_path)
-            df = df['ners'].apply(lambda x: literal_eval(x) if isinstance(x,str) else x) #list is stored as string in csv. Converted back to list
+            df['ners'] = df['ners'].apply(lambda x: literal_eval(x) if isinstance(x,str) else x) #list is stored as string in csv. Converted back to list
             return df
             
         df = load_subtitles_dataset(dataset_path)
